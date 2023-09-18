@@ -25,6 +25,13 @@ async def correct(callback:types.CallbackQuery):
                 prices=[Price1, Price2, Price3],
                 payload='test_payload',
                 start_parameter='subscribe',
+                photo_url = 'https://i.ytimg.com/vi/Q0xMZmL8zT8/hqdefault.jpg',
+                photo_size=320,
+                photo_height= 360,
+                photo_width=480,
+                max_tip_amount=100000,
+                suggested_tip_amounts=[100, 1000, 10000, 100000],
+                need_phone_number=True,
                 reply_markup=delete_keyboard)
         elif callback.data == 'other':
             await callback.message.edit_text(text_callback_other, reply_markup=buy_vote)
@@ -45,7 +52,16 @@ async def successful_pay(message: types.Message):
     pay_info = message.successful_payment.to_python()
     for k, v in pay_info.items():
         print(k, v, sep=' ')
-    delet = await message.answer(f'Платеж на сумму {message.successful_payment.total_amount // 100} {message.successful_payment.currency} от [{message.chat.first_name}](t.me/{message.from_user.username}), прошел успешно (Сообщение удалиться через 30 секунд)',
+    currency = pay_info.items()['currency']
+    total_amount = pay_info.items()['total_amount']
+    invoice_payload = pay_info.items()['invoice_payload']
+    delet = await message.answer(f'''
+        Платеж на сумму {message.successful_payment.total_amount // 100} {message.successful_payment.currency} от [{message.chat.first_name}](t.me/{message.from_user.username}), прошел успешно 
+        Вы так же можете получить всю инеобходимую информацию о платеже в удобном для вас виде:
+        Валюта оплаты - {currency}
+        Сумма оплаты - {total_amount}
+        Описание выбранного товара - {invoice_payload}
+        (Сообщение удалиться через 30 секунд)''',
                         parse_mode='Markdown', 
                         disable_web_page_preview=True)
     await asyncio.sleep(30)
